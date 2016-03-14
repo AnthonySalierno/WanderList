@@ -1,16 +1,41 @@
 const express = require('express');
 const app = express();
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const db = mongoose.connection;
+const User = require('./users/userModel');
 
-const port = 8080;
+const port = process.env.PORT || 8080;
 
+mongoose.connect('mongodb://localhost/wanderlist');
+
+// Middleware
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: true,
+}));
+
+// Routes
+// GET / Read
 app.get('/', (req, res) => {
-  res.send('GET hit');
+  res.send('GET request successful');
 });
 
+// POST / Create
 app.post('/login', (req, res) => {
-  res.send('POST hit');
+  const user = new User;
+
+  user.username = req.body.username;
+  user.password = req.body.password;
+
+  user.save((err) => {
+    if (err) {
+      res.send(err);
+    }
+  });
+  res.send('User added to the database: ' + user);
 });
 
 app.listen(port, () => {
-  console.log('Example app is listening on port 8080')
+  console.log('Example app is listening on port ' + port);
 });

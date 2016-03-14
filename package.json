@@ -4,6 +4,7 @@
   "description": "Travel application",
   "main": "index.js",
   "scripts": {
+    "lint": "node_modules/.bin/eslint ./",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -24,6 +25,8 @@
     "nodemon": "^1.9.1"
   },
   "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "^1.15.0",
     "express": "^4.13.4",
     "mongoose": "^4.4.7",
     "node": "0.0.0"
