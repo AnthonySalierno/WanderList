@@ -3,16 +3,9 @@ const app = express();
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const db = mongoose.connection;
+const User = require('./users/userModel');
 
 const port = process.env.PORT || 8080;
-
-db.on('error', console.error());
-db.once('open', () => {
-  const userOne = {
-    username: "AnthonySalierno",
-    password: 'password123',
-  },
-});
 
 mongoose.connect('mongodb://localhost/wanderlist');
 
@@ -23,12 +16,24 @@ app.use(bodyParser.urlencoded({
 }));
 
 // Routes
+// GET / Read
 app.get('/', (req, res) => {
   res.send('GET request successful');
 });
 
+// POST / Create
 app.post('/login', (req, res) => {
-  res.send('Sucessful login attempt by: ' + req.body.username);
+  const user = new User;
+
+  user.username = req.body.username;
+  user.password = req.body.password;
+
+  user.save((err) => {
+    if (err) {
+      res.send(err);
+    }
+    res.send('User added to the database: ' + user);
+  });
 });
 
 app.listen(port, () => {

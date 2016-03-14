@@ -1,9 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const bcrypt = require(bcrypt);
-const SALT_WORK_FACTOR = 10;
 
-const UserSchema = new mongoose.schema({
+const UserSchema = new Schema({
   username: {
     type: String,
     required: true,
@@ -13,6 +11,6 @@ const UserSchema = new mongoose.schema({
     type: String,
     required: true,
   }
-};
+});
 
 module.exports = mongoose.model('users', UserSchema);
