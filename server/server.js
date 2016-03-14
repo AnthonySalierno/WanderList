@@ -32,8 +32,8 @@ app.post('/login', (req, res) => {
     if (err) {
       res.send(err);
     }
-    res.send('User added to the database: ' + user);
   });
+  res.send('User added to the database: ' + user);
 });
 
 app.listen(port, () => {
