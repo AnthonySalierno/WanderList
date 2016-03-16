@@ -9,6 +9,14 @@ const port = process.env.PORT || 8080;
 
 mongoose.connect('mongodb://localhost/wanderlist');
 
+db.on('error', () => {
+  console.log('Error connecting to the database');
+});
+
+db.once('open', () => {
+  console.log('MongoDB is open');
+});
+
 // Middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -17,8 +25,13 @@ app.use(bodyParser.urlencoded({
 
 // Routes
 // GET / Read
-app.get('/', (req, res) => {
-  res.send('GET request successful');
+app.get('/:user', (req, res) => {
+  User.findOne({username: req.params.user}, function(err, person) {
+    if (err) {
+      return handleError(err);
+    }
+    res.send(person);
+  });
 });
 
 // POST / Create
