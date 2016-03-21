@@ -5,7 +5,6 @@ const CitySchema = new Schema({
   name: {
     type: String,
   },
-  temperature: {
-    type: Number,
-  },
 });
+
+module.exports = mongoose.model('cities', 'CitySchema');

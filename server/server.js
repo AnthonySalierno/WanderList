@@ -3,19 +3,21 @@ const app = express();
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const db = mongoose.connection;
+
 const User = require('./users/userModel');
+const Cities = require('./cities/cityModel')
 
 const port = process.env.PORT || 8080;
 
 mongoose.connect('mongodb://localhost/wanderlist');
 
-// Middleware
+// Middleware - make own file
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: true,
 }));
 
-// Routes
+// Routes - make own file
 // GET / Read
 app.get('/', (req, res) => {
   res.send('GET request successful');
@@ -35,6 +37,10 @@ app.post('/login', (req, res) => {
   });
   res.send('User added to the database: ' + user);
 });
+
+// app.put();
+
+// app.delete();
 
 app.listen(port, () => {
   console.log('Example app is listening on port ' + port);
