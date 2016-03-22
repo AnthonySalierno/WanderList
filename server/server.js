@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const db = mongoose.connection;
 
 const User = require('./users/userModel');
-const Cities = require('./cities/cityModel')
+const City = require('./cities/cityModel');
 
 const port = process.env.PORT || 8080;
 
@@ -20,27 +20,125 @@ app.use(bodyParser.urlencoded({
 // Routes - make own file
 // GET / Read
 app.get('/', (req, res) => {
+  // Changes this to serve index / main page
   res.send('GET request successful');
+});
+
+// app.get('/api/cities/visited', (req, res) => {
+  
+// });
+
+// app.get('/api/cities/planned', (req, res) => {
+  
+// });
+
+// app.post('/signin', (req, res) => {
+  
+// });
+
+// app.post('/signout', (req, res) => {
+  
+// });
+
+// app.put('/api/cities/visited', (req, res) => {
+  
+// });
+
+// How do I make the same page handle multiple POST requests?
+// POST cities user has already been to
+app.post('/api/cities/visited', (req, res) => {
+  // Create city to store
+  var newCity = City({
+    name: req.body.name,
+    dateVisited: req.body.dateVisited,
+    // datePlanned: req.body.city,
+  });
+  // Check if city exists in database already
+  City.findOne({
+    city: req.body.city,
+  })
+  .then((city) => {
+    // If city exists, throw error message
+    if (city) {
+      next(new Error('You have already added this city!'));
+    } else {
+      // If it doesn't exist, save it to database
+      console.log("Something is happening");
+      newCity.save(function(err, success) {
+        if (err) {
+          console.log(err);
+          throw err;
+        } else {
+          res.sendStatus(200);
+        }
+      });
+    }
+  })
+});
+
+// POST cities user has yet to go to
+app.post('/api/cities/planned', (req, res) => {
+  City.findOne({
+    city: req.body.city,
+  })
+  .then((city) => {
+    if (city) {
+      next(new Error('You have already added this city!'));
+    } else {
+      City.create({
+        city: req.body.city,
+      });
+    }
+  });
+});
+
+// Should I use next here?  Is next an Express thing?
+app.get('signup', (req, res, next) => {
+  User.findOne({
+    username: req.body.username,
+  })
+  .then((user) => {
+    if (user) {
+      next(new Error('This username is taken, please try a new one.'));
+    } else {
+      User.create({
+        username: req.body.username,
+        password: req.body.password,
+      });
+    }
+  })
 });
 
 // POST / Create
 app.post('/login', (req, res) => {
-  const user = new User;
+  const newUser = new User({
+    username: req.body.username,
+    password: req.body.password,
+  });
 
-  user.username = req.body.username;
-  user.password = req.body.password;
-
-  user.save((err) => {
+  newUser.save((err) => {
     if (err) {
       res.send(err);
     }
   });
-  res.send('User added to the database: ' + user);
+  res.send('User added to the database: ' + newUser);
 });
 
-// app.put();
+// app.post('/logout', (req, res) => {
 
-// app.delete();
+// });
+
+// app.put('/api/cities/planned', (req, res) => {
+  
+// });
+
+// app.delete('/api/cities/planned', (req, res) => {
+  
+// });
+
+// app.delete('/api/cities/planned', (req, res) => {
+  
+// });
 
 app.listen(port, () => {
   console.log('Example app is listening on port ' + port);
