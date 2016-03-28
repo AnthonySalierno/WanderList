@@ -1,5 +1,6 @@
-const User = require('../../users/userController.js');
-const City = require('../../cities/cityController.js');
+const User = require('./users/userModel');
+const City = require('./cities/cityModel');
+
 
 module.exports = (app) => {
   // GET / Read
