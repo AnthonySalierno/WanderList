@@ -1,7 +1,6 @@
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
 const db = mongoose.connection;
 
 const User = require('./users/userModel');
@@ -11,12 +10,6 @@ const port = process.env.PORT || 8080;
 
 mongoose.connect('mongodb://localhost/wanderlist');
 
-// Middleware - make own file
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-  extended: true,
-}));
-
 // Routes - make own file
 // GET / Read
 app.get('/', (req, res) => {
@@ -24,38 +17,43 @@ app.get('/', (req, res) => {
   res.send('GET request successful');
 });
 
-// app.get('/api/cities/visited', (req, res) => {
-  
-// });
+app.get('/api/cities/visited', (req, res) => {
+  City.find({
+    name: req.body.name,
+  })
+  .then(cities) => {
+    res.send(cities);
+  }
+});
 
 // app.get('/api/cities/planned', (req, res) => {
-  
+
 // });
 
 // app.post('/signin', (req, res) => {
-  
+
 // });
 
 // app.post('/signout', (req, res) => {
-  
+
 // });
 
 // app.put('/api/cities/visited', (req, res) => {
-  
+
 // });
 
 // How do I make the same page handle multiple POST requests?
 // POST cities user has already been to
 app.post('/api/cities/visited', (req, res) => {
   // Create city to store
-  var newCity = City({
+  const newCity = City({
     name: req.body.name,
     dateVisited: req.body.dateVisited,
     // datePlanned: req.body.city,
   });
   // Check if city exists in database already
   City.findOne({
-    city: req.body.city,
+    name: req.body.name,
   })
   .then((city) => {
     // If city exists, throw error message
@@ -63,10 +61,8 @@ app.post('/api/cities/visited', (req, res) => {
       next(new Error('You have already added this city!'));
     } else {
       // If it doesn't exist, save it to database
-      console.log("Something is happening");
       newCity.save(function(err, success) {
         if (err) {
-          console.log(err);
           throw err;
         } else {
           res.sendStatus(200);
@@ -78,18 +74,31 @@ app.post('/api/cities/visited', (req, res) => {
 
 // POST cities user has yet to go to
 app.post('/api/cities/planned', (req, res) => {
+  // Create city to store
+  const newCity = City({
+    name: req.body.name,
+    dateVisited: req.body.dateVisited,
+    // datePlanned: req.body.city,
+  });
+  // Check if city exists in database already
   City.findOne({
-    city: req.body.city,
+    name: req.body.name,
   })
   .then((city) => {
+    // If city exists, throw error message
     if (city) {
       next(new Error('You have already added this city!'));
     } else {
-      City.create({
-        city: req.body.city,
+      // If it doesn't exist, save it to database
+      newCity.save(function(err, success) {
+        if (err) {
+          throw err;
+        } else {
+          res.sendStatus(200);
+        }
       });
     }
-  });
+  })
 });
 
 // Should I use next here?  Is next an Express thing?
@@ -129,15 +138,15 @@ app.post('/login', (req, res) => {
 // });
 
 // app.put('/api/cities/planned', (req, res) => {
-  
+
 // });
 
 // app.delete('/api/cities/planned', (req, res) => {
-  
+
 // });
 
 // app.delete('/api/cities/planned', (req, res) => {
-  
+
 // });
 
 app.listen(port, () => {
