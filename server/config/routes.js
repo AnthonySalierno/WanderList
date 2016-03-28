@@ -1,22 +1,71 @@
-const User = require('./users/userModel');
-const City = require('./cities/cityModel');
-
+const User = require('../users/userModel.js');
+const City = require('../cities/cityModel.js');
 
 module.exports = (app) => {
-  // GET / Read
-  app.get('/', (req, res) => {
-    // Changes this to serve index / main page
+  app.get('/', (req, res, next) => {
     res.send('GET request successful');
   });
 
-  app.get('/api/cities/visited', (req, res) => {
-    City.find({
-      name: req.body.name,
+  app.post('/signup', (req, res, next) => {
+    const username = req.body.username;
+    const password = req.body.password;
+    User.findOne({ username: username })
+    .then((found) => {
+      if (found) {
+        throw new Error(username, ' already exists, please try another!');
+      } else {
+        const user = {
+          username: username,
+          password: password,
+        };
+        return User.create(user)
+        .then((user) => {
+          res.status(201).json(user);
+        })
+        .fail((error) => {
+          res.send(404);
+        })
+      }
     })
-    .then(cities) => {
-      res.send(cities);
-    }
   });
+
+  app.post('/api/cities/visited', (req, res, next) => {
+    const cityName = req.body.cityName;
+    const dateVisited = req.body.dateVisited;
+    City.findOne({
+      cityName: cityName,
+      dateVisited: dateVisited,
+    })
+    .then((found) => {
+      if (found) {
+        throw new Error(cityName, ' already visited on that date, please try another!');
+      } else {
+        const city = {
+          cityName: cityName,
+          dateVisited: dateVisited,
+        };
+        return City.create(city)
+        .then((city) => {
+          res.status(201);
+        })
+        .fail((error) => {
+          res.send(404);
+        })
+      }
+    })
+  });
+
+};
+
+/*
+  // app.get('/api/cities/visited', (req, res) => {
+  //   City.find({
+  //     name: req.body.name,
+  //   })
+  //   .then(cities) => {
+  //     res.send(cities);
+  //   }
+  // });
 
   // app.get('/api/cities/planned', (req, res) => {
 
@@ -140,4 +189,4 @@ module.exports = (app) => {
   // app.delete('/api/cities/planned', (req, res) => {
 
   // });
-}
+*/
